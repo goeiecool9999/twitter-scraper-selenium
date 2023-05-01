@@ -45,6 +45,7 @@ class Profile:
 
     def __check_tweets_presence(self, tweet_list):
         if len(tweet_list) <= 0:
+            print (f'decrementing: {self.retry}')
             self.retry -= 1
 
     def __check_retry(self):
@@ -60,14 +61,16 @@ class Profile:
             while len(self.posts_data) < self.tweets_count:
                 for tweet in present_tweets:
                     status, tweet_url = Finder.find_status(tweet)
+                    if status == "" or tweet_url == "":
+                        continue
                     replies = Finder.find_replies(tweet)
                     retweets = Finder.find_shares(tweet)
                     status = status[-1]
                     username = tweet_url.split("/")[3]
-                    is_retweet = True if self.twitter_username.lower() != username.lower() else False
+                    is_retweet = self.twitter_username.lower() != username.lower()
                     name = Finder.find_name_from_tweet(
                         tweet, is_retweet)
-                    retweet_link = tweet_url if is_retweet is True else ""
+                    retweet_link = tweet_url if is_retweet else ""
                     posted_time = Finder.find_timestamp(tweet)
                     content = Finder.find_content(tweet)
                     likes = Finder.find_like(tweet)
@@ -96,10 +99,15 @@ class Profile:
                         "tweet_url": tweet_url,
                         "link": link
                     }
+                    try:
+                        self.__driver.execute_script("arguments[0].scrollIntoView(true);", tweet)
+                    except StaleElementRerefenceException as ex:
+                        pass
+                    thingy = Utilities.find_loading_circle(self.__driver)
+                    print("yolo")
 
-                Utilities.scroll_down(self.__driver)
-                Utilities.wait_until_completion(self.__driver)
-                Utilities.wait_until_tweets_appear(self.__driver)
+                import time
+                time.sleep(1)
                 present_tweets = Finder.find_all_tweets(
                     self.__driver)
                 present_tweets = [

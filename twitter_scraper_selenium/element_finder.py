@@ -70,7 +70,7 @@ class Finder:
             return (anchor.get_attribute("href").split("/"), anchor.get_attribute("href"))
         except Exception as ex:
             logger.exception("Error at method find_status : {}".format(ex))
-            return []
+            return ("","")
 
     @staticmethod
     def find_all_anchor_tags(tweet) -> Union[list, None]:
@@ -166,8 +166,9 @@ class Finder:
             anchors = Finder.find_all_anchor_tags(tweet)
             if len(anchors) > 2:
                 if is_retweet:
-                    name = tweet.find_element(
-                        By.CSS_SELECTOR, '[data-testid="User-Names"] > div a').text
+                    name = "unknown"
+                    # name = tweet.find_element(
+                    #     By.CSS_SELECTOR, '[data-testid="User-Names"] > div a').text
                 else:
                     name = anchors[1].text.split("\n")[0]
             return name

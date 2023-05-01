@@ -42,17 +42,21 @@ class Utilities:
     def scroll_down(driver) -> None:
         """Helps to scroll down web page"""
         try:
-            body = driver.find_element(By.CSS_SELECTOR, 'body')
-            for _ in range(randint(1, 3)):
-                body.send_keys(Keys.PAGE_DOWN)
+            driver.execute_script ("window.scrollByPages(1)", "")
         except Exception as ex:
             logger.exception("Error at scroll_down method {}".format(ex))
+
+    def find_loading_circle(driver) -> None:
+        try:
+            return driver.find_element(By.XPATH, '//div/div/div[@style="height: 26px; width: 26px;"]/svg')
+        except Exception as ex:
+            return None
 
     @staticmethod
     def wait_until_completion(driver) -> None:
         """waits until the page have completed loading"""
         try:
-            state = ""
+            state = driver.execute_script("return document.readyState")
             while state != "complete":
                 time.sleep(randint(3, 5))
                 state = driver.execute_script("return document.readyState")
